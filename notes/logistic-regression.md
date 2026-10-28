@@ -2,11 +2,11 @@
 
 ## Shapes and notation
 
-For one example, I chose column vectors:
+For one example, I chose a row vector for the inputs and a column vector for the weights:
 
 $$X \in \mathbb{R}^{1\times6}, \qquad W \in \mathbb{R}^{6\times1}$$
 
-$$m = examples$$
+$$m = \text{number of examples}$$
 
 ## Forward pass
 
@@ -20,7 +20,7 @@ $$x_1w^{[1]}_1 + x_2w^{[1]}_2 + \cdots + x_iw^{[1]}_i + b = z$$
 
 $$[x_1, x_2, \cdots, x_i]@[w^{[1]}_1, w^{[1]}_2, \cdots, w^{[1]}_i]^T + b = z$$
 
-My vectorized:
+My vectorized form:
 
 $$XW^{[1]} + b = Z^{[1]}$$
 
@@ -32,8 +32,6 @@ Adding a function for non-linearity
 
 $$g(Z^{[1]}) = A^{[1]}$$
 
-<!-- $$(m,6) \times (6,m) = (m,m)$$ -->
-
 The activation function we will be using:
 
 $$g(x) = \frac{1}{1+e^{-x}}$$
@@ -42,7 +40,7 @@ $$g(x) = \frac{1}{1+e^{-x}}$$
 
 $$L(y, ŷ) = -[y{\log}(ŷ)+(1-y){\log}(1 - ŷ)]$$
 
-For ease of writting loss will be $$L$$ and $$dL$$ implies the derivative of the loss function
+I write the loss as $L$. A derivative such as $dL/da$ specifies which variable the loss is differentiated with respect to.
 
 ## Gradients and parameter updates
 
@@ -58,20 +56,20 @@ $$\frac{dL}{db} = a - y$$
 
 ## Checks and explanation
 
-Since we can't directly get dw from $dL$ we have to use the chain rule in our backwards computation (l $\rightarrow$ a $\dots$ a $\rightarrow$ z $\dots$ z $\rightarrow$ w):
+Since we can't directly get dw from $dL$ we have to use the chain rule in our backwards computation ($L \rightarrow a \rightarrow z \rightarrow w$):
 
 $$\frac{dL}{dw} = \frac{dL}{da}\times\frac{da}{dz}\times\frac{dz}{dw}$$
 
 $$\frac{dL}{db} = \frac{dL}{da}\times\frac{da}{dz}\times\frac{dz}{db}$$
 
-now let's find the derivatives of each of those to calculate
+Now find each derivative in the chain.
 
 ### Derivative of loss
 
-$$\frac{dL}{da} = \frac{d}{da}(Loss(y,a))$$
+$$\frac{dL}{da} = \frac{d}{da}L(y,a)$$
 $$= \frac{d}{da}(-[y\log(a) + (1 - y)\log(1 - a)])$$
 $$= -y \frac{d}{da}\log(a) - (1 - y)\frac{d}{da}\log(1 - a)$$
-$$= -y \frac{1}{a} - (1 - y)\frac{1}{(1 - a)} \times {-1}$$
+$$= -y \frac{1}{a} - (1 - y)\frac{1}{1-a} \times (-1)$$
 $$=  -\frac{y}{a} + \frac{1 - y}{1 - a}$$
 
 ### Derivative of sigmoid
@@ -86,7 +84,7 @@ can be rewritten like:
 $$\frac{da}{dz} = e^{-z}a^{2}$$
 
 since sigmoid is:
-$$a = \frac{1}{(1+e^{-z})}$$
+$$a = \frac{1}{1+e^{-z}}$$
 $$a(1+e^{-z}) = 1$$
 $$a+ae^{-z} = 1$$
 $$ae^{-z} = 1 - a$$
@@ -94,10 +92,7 @@ $$ae^{-z} = 1 - a$$
 we rewrite as:
 $$\frac{da}{dz} = a(1-a)$$
 
-<!-- somehow -->
-<!-- $$\frac{dL}{da} = y - a??$$ -->
-
-### derivative of linear regression formula
+### Derivative of the linear expression
 
 $$\frac{dz}{dw} = \frac{d}{dw}(wx+b)$$
 $$\frac{dz}{dw} = x$$
@@ -109,21 +104,21 @@ $$\frac{dz}{db} = 0 + 1 = 1$$
 
 ### Resulting formulas
 
-calculate for dw
+For the weight:
 
 $$\frac{dL}{dw} = \frac{dL}{da}\times\frac{da}{dz}\times\frac{dz}{dw}$$
-$$\frac{dL}{dw} = (-\frac{y}{a} + \frac{1 - y}{1 - a})\times(a(1-a))\times(x)$$
-$$\frac{dL}{dw} = x(-\frac{(y)(a(1-a))}{a} + \frac{(a(1-a))(1 - y)}{1 - a})$$
-$$= x(-y(1-a) + (a1 - y))$$
+$$\frac{dL}{dw} = (-\frac{y}{a} + \frac{1 - y}{1 - a})\,a(1-a)\,x$$
+$$\frac{dL}{dw} = x\left(-\frac{ya(1-a)}{a} + \frac{a(1-a)(1-y)}{1-a}\right)$$
+$$= x(-y(1-a) + a(1-y))$$
 $$= x(-y+ya + a - ya)$$
 $$= x(a - y)$$
 
-now for bias
+For the bias:
 
 $$\frac{dL}{db} = \frac{dL}{da}\times\frac{da}{dz}\times\frac{dz}{db}$$
 
-$$\frac{dL}{db} = (-\frac{y}{a} + \frac{1 - y}{1 - a})\times(a(1-a))\times(1)$$
-$$= (-\frac{(a(1-a))(y)}{a} + \frac{(a(1-a))(1 - y)}{1 - a})$$
-$$= -(1-a)(y) + (a)(1 - y)$$
+$$\frac{dL}{db} = (-\frac{y}{a} + \frac{1 - y}{1 - a})\,a(1-a)$$
+$$= -\frac{a(1-a)y}{a} + \frac{a(1-a)(1-y)}{1-a}$$
+$$= -y(1-a) + a(1-y)$$
 $$= ya-y+a-ya$$
 $$= a-y$$
