@@ -2,11 +2,20 @@
 
 ## Shapes and notation
 
-For one example, I chose a row vector for the inputs and a column vector for the weights:
+Examples are columns. There are six input features and one output neuron.
 
-$$X \in \mathbb{R}^{1\times6}, \qquad W \in \mathbb{R}^{6\times1}$$
+$$m = \text{number of examples}, \qquad n_x = n^{[0]} = 6, \qquad n^{[1]} = 1$$
 
-$$m = \text{number of examples}$$
+For one example:
+
+$$x \in \mathbb{R}^{n_x\times1}, \qquad W^{[1]} \in \mathbb{R}^{1\times n_x}, \qquad b^{[1]} \in \mathbb{R}^{1\times1}$$
+
+For a batch:
+
+$$X = A^{[0]} \in \mathbb{R}^{n_x\times m}$$
+$$Z^{[1]}, A^{[1]}, Y \in \mathbb{R}^{1\times m}$$
+
+Layer weights use the convention $W^{[l]} \in \mathbb{R}^{n^{[l]}\times n^{[l-1]}}$: rows are output neurons and columns are input features. The same weights are shared across all $m$ examples.
 
 ## Forward pass
 
@@ -18,15 +27,15 @@ My weighted-sum notation:
 
 $$x_1w^{[1]}_1 + x_2w^{[1]}_2 + \cdots + x_iw^{[1]}_i + b = z$$
 
-$$[x_1, x_2, \cdots, x_i]@[w^{[1]}_1, w^{[1]}_2, \cdots, w^{[1]}_i]^T + b = z$$
+$$[w^{[1]}_1, w^{[1]}_2, \cdots, w^{[1]}_i]\begin{bmatrix}x_1\\x_2\\\vdots\\x_i\end{bmatrix} + b = z$$
 
 My vectorized form:
 
-$$XW^{[1]} + b = Z^{[1]}$$
+$$W^{[1]}X + b^{[1]} = Z^{[1]}$$
 
 or
 
-$$A^{[0]}W^{[1]} + b = Z^{[1]}$$
+$$W^{[1]}A^{[0]} + b^{[1]} = Z^{[1]}$$
 
 Adding a function for non-linearity
 
@@ -44,7 +53,7 @@ I write the loss as $L$. A derivative such as $dL/da$ specifies which variable t
 
 ## Gradients and parameter updates
 
-The gradients we calculate using derivatives.
+The derivations below are for a single example and one scalar weight $w$. Batch gradients must match the shapes of $W^{[1]}$ and $b^{[1]}$, respectively.
 
 $$w^{[l]} := w^{[l]} - \alpha \times {\text dw}^{[l]}$$
 $$b^{[l]} := b^{[l]} - \alpha \times {\text db}^{[l]}$$
